@@ -1,29 +1,13 @@
-// usbscale
+// Automail
 // =========
 //
-// C utility to read weight from a USB scale.
+// C utility to read weight from a USB scale and upload the data to a server.
 //
-// Usage: usbscale
+// Usage: Automail
 //
-// There are no options. **usbscale** will try to read data from the first
-// scale it finds when enumerating your USB devices.
 //
 /*
-usbscale
-Copyright (C) 2011 Eric Jiang
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Automail is a modified version of usbscale.
 */
 #include <stdio.h>
 #include <sys/types.h>
@@ -64,6 +48,9 @@ static libusb_device* find_scale(libusb_device**);
 // program should read again (i.e. continue looping).
 //
 static int print_scale_data(unsigned char*);
+
+//
+// **get_scale_data** takes the 6-byte output from the scale and returns the value.
 static double get_scale_data(unsigned char*);
 
 //
@@ -93,15 +80,15 @@ const char* UNITS[13] = {
     "lbs"           // pound
 };
 
-void printToString(float fVal, char *result);
-
 //
 // main
 // ----
 //
 int main(void)
 {
+   // Let the wifi connect
    sleep(30);
+
    MYSQL *conn;
    MYSQL_RES *res;
    MYSQL_ROW row;
@@ -611,23 +598,3 @@ uint8_t get_first_endpoint_address(libusb_device* dev)
 
     return endpoint_address;
 }
-void printToString(float fVal, char *result)
-{
-    int dVal, dec, i;
-   
-    dec = (int)(fVal * 100);
-    printf("dec %d", dec);
-   // memset(result, 0, 100);
-    if (dec % 1000 == 0) {result[0] = '0';} else {
-    result[0] = (dec % 1000) + '0'; }
-    if (dec % 1000 == 0) {result[0] = '0';} else {
-    result[1] = (dec % 100) + '0'; }
-    result[2] = '.';
-    if (dec % 1000 == 0) {result[0] = '0';} else {
-    result[3] = (dec % 10) + '0'; }
-
-    for(i=0; i<4; i++)
-	{
-	    printf("%c \n", result[i]);
-	}
-};
